@@ -42,6 +42,11 @@ li{
     border-bottom: #eee solid 1px;
 }
 
+.completed{
+    color: #cccccc;
+    text-decoration: line-through;
+}
+
 .delete-todo{
     float: right;
     font-weight: bold;

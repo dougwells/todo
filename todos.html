@@ -34,11 +34,11 @@
     </form>
     <ul>
         {{#each todos}}
-            <li>
+            <li class="{{#if this.isChecked}}completed{{/if}}">
                 <button class="delete-todo">&times;</button>
-                <input type="checkbox" class="toggle-check">
+                <input type="checkbox" checked={{this.isChecked}} class="toggle-checked">
                 <span>
-                    {{this.text}}
+                      {{this.text}}
                 </span>
             </li>
         {{/each}}
