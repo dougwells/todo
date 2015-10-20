@@ -11,10 +11,7 @@ if (Meteor.isClient) {
     Template.main.events({
         "submit .new-todo": function(event){
             var newText = event.target.newTodo.value;
-            Todos.insert({
-                text: newText,
-                createdAt:  new Date()
-            });
+            Meteor.call('addTodo', newText);
             //Clear Form
             event.target.newTodo.value = "";
             //Prevent Submit
@@ -22,20 +19,55 @@ if (Meteor.isClient) {
         },
 
             "click .toggle-checked": function(){
-                if (this.isChecked){
-                    this.isChecked=false;
-                }else{
-                    this.isChecked=true;
-                }
-                Todos.update(this._id, {$set:{isChecked: this.isChecked}});
+                Meteor.call('setChecked',this.isChecked,this._id);
             },
 
             "click .delete-todo": function(){
-                    Todos.remove(this._id);
+                    Meteor.call('deleteTodo',this._id);
             }
+    });
+
+    Accounts.ui.config({
+        passwordSignupFields: "USERNAME_ONLY"
     });
 }
 
 if (Meteor.isServer) {
 
 }
+
+//Meteor Methods (can call in Client and/or Server)
+
+Meteor.methods({
+    addTodo: function(text) {
+        if (!Meteor.userId()) {
+            throw new Meteor.Error("Please Log-In");
+        } else {
+            Todos.insert({
+                text: text,
+                createdAt: new Date(),
+                userId: Meteor.userId(),
+                username: Meteor.user().username
+            });
+        }
+    },
+
+    deleteTodo: function(todoId){
+        Todos.remove(todoId);
+    },
+
+    setChecked: function(status,todoId){
+        if (status){
+            status=false;
+        }else{
+            status=true;
+        }
+        Todos.update(todoId, {$set:{isChecked: status}});
+    },
+
+    "click .delete-todo": function(){
+        Meteor.call('deleteTodo',this._id);
+    }
+
+});
+
