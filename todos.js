@@ -1,6 +1,7 @@
 Todos = new Mongo.Collection('todos');
 
 if (Meteor.isClient) {
+    Meteor.subscribe("userTodos");
 
     Template.main.helpers({
         todos: function(){
@@ -33,7 +34,9 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isServer) {
-
+    Meteor.publish("userTodos", function(){
+        return Todos.find({userId: this.userId});
+    });
 }
 
 //Meteor Methods (can call in Client and/or Server)
@@ -53,7 +56,12 @@ Meteor.methods({
     },
 
     deleteTodo: function(todoId){
-        Todos.remove(todoId);
+        var currentTodo = Todos.find(todoId);
+        if (Meteor.userId()){
+            Todos.remove(todoId);
+        }else {
+            alert("Please Log-In");
+        }
     },
 
     setChecked: function(status,todoId){
